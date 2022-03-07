@@ -15,6 +15,9 @@ import org.w3c.dom.Text;
 
 public class QuizActivity extends AppCompatActivity {
 
+    private static final String TAG = "QuizActivity";
+    private static final String KEY_INDEX = "index";
+    private int mCurrentIndex = 0;
     private Button mTrueButton;
     private Button mFalseButton;
     private ImageButton mNextButton;
@@ -27,15 +30,16 @@ public class QuizActivity extends AppCompatActivity {
             new Question(R.string.question_americas, true),
             new Question(R.string.question_asia, true),
     };
-    private int mCurrentIndex = 0;
-    private static final String TAG = "QuizActivity";
-    private static final Integer KEY_INDEX = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate(Bundle) called");
         setContentView(R.layout.activity_quiz);
+
+        if (savedInstanceState != null) {
+            mCurrentIndex = savedInstanceState.getInt(KEY_INDEX, 0);
+        }
 
         //QUESTION TEXT VIEW
         mQuestionTextView = (TextView) findViewById(R.id.question_text_view);
@@ -94,6 +98,13 @@ public class QuizActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         Log.d(TAG, "onPause() called");
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        Log.i(TAG, "onSaveInstanceState");
+        savedInstanceState.putInt(KEY_INDEX, mCurrentIndex);
     }
 
     @Override
