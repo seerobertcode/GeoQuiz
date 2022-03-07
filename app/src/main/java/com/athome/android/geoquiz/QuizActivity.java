@@ -29,6 +29,7 @@ public class QuizActivity extends AppCompatActivity {
     };
     private int mCurrentIndex = 0;
     private static final String TAG = "QuizActivity";
+    private static final Integer KEY_INDEX = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
