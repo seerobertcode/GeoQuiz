@@ -156,14 +156,15 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     private void checkAnswer(boolean userPressedTrue) {
-        int messageResId = 0;
         boolean answerIsTrue = mQuestionBank[mCurrentIndex].isAnswerTrue();
         mQuestionBank[mCurrentIndex].setQuestionAnswered(true);
         buttonsEnabled(false);
         answeredQuestions++;
+        int messageResId = 0;
 
         if (userPressedTrue == answerIsTrue) {
             messageResId = R.string.correct_toast;
+            correctAnswers++;
         } else {
             messageResId = R.string.incorrect_toast;
         }
