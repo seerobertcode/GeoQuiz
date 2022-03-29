@@ -23,13 +23,23 @@ public class QuizActivity extends AppCompatActivity {
     private ImageButton mNextButton;
     private TextView mQuestionTextView;
     private final Question[] mQuestionBank = new Question[]{
-            new Question(R.string.question_australia, true),
-            new Question(R.string.question_oceans, true),
-            new Question(R.string.question_mideast, false),
-            new Question(R.string.question_africa, false),
-            new Question(R.string.question_americas, true),
-            new Question(R.string.question_asia, true),
+            new Question(R.string.question_australia, true, false),
+            new Question(R.string.question_oceans, true, false),
+            new Question(R.string.question_mideast, false, false),
+            new Question(R.string.question_africa, false, false),
+            new Question(R.string.question_americas, true, false),
+            new Question(R.string.question_asia, true, false),
     };
+    // Counters to keep track of number of questions answered and how many correct
+    private int answeredQuestions = 0;
+    private int correctAnswers = 0;
+    // Array to save the state of which questions were answered the size of mQuestion Bank
+    private boolean[] whichAnswered = new boolean[mQuestionBank.length];
+
+    // KEYS to save state if user rotates device and the Activity is recreated
+    private static final String KEY_ANSWERED_QUESTIONS = "number_answered";
+    private static final String KEY_CORRECT_ANSWERS = "number_correct";
+    private static final String KEY_WHICH_QUESTIONS_ANSWERED = "which_answered";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +49,13 @@ public class QuizActivity extends AppCompatActivity {
 
         if (savedInstanceState != null) {
             mCurrentIndex = savedInstanceState.getInt(KEY_INDEX, 0);
+            answeredQuestions = savedInstanceState.getInt(KEY_ANSWERED_QUESTIONS);
+            correctAnswers = savedInstanceState.getInt(KEY_CORRECT_ANSWERS);
+            whichAnswered = savedInstanceState.getBooleanArray(KEY_WHICH_QUESTIONS_ANSWERED);
+
+            for (int i = 0; i < mQuestionBank.length; i++) {
+                mQuestionBank[i].setQuestionAnswered(whichAnswered[i]);
+            }
         }
 
         //QUESTION TEXT VIEW
@@ -105,6 +122,14 @@ public class QuizActivity extends AppCompatActivity {
         super.onSaveInstanceState(savedInstanceState);
         Log.i(TAG, "onSaveInstanceState");
         savedInstanceState.putInt(KEY_INDEX, mCurrentIndex);
+
+        //saving state for other keys and variables
+        savedInstanceState.putInt(KEY_ANSWERED_QUESTIONS, answeredQuestions);
+        savedInstanceState.putInt(KEY_CORRECT_ANSWERS, correctAnswers);
+        for (int i = 0; i < mQuestionBank.length; i++) {
+            whichAnswered[i] = mQuestionBank[i].isQuestionAnswered();
+        }
+        savedInstanceState.putBooleanArray(KEY_WHICH_QUESTIONS_ANSWERED, whichAnswered);
     }
 
     @Override
@@ -122,11 +147,20 @@ public class QuizActivity extends AppCompatActivity {
     private void updateQuestion() {
         int question = mQuestionBank[mCurrentIndex].getTextResId();
         mQuestionTextView.setText(question);
+
+        if (!mQuestionBank[mCurrentIndex].isQuestionAnswered()) {
+            buttonsEnabled(true);
+        } else {
+            buttonsEnabled(false);
+        }
     }
 
     private void checkAnswer(boolean userPressedTrue) {
-        boolean answerIsTrue = mQuestionBank[mCurrentIndex].isAnswerTrue();
         int messageResId = 0;
+        boolean answerIsTrue = mQuestionBank[mCurrentIndex].isAnswerTrue();
+        mQuestionBank[mCurrentIndex].setQuestionAnswered(true);
+        buttonsEnabled(false);
+        answeredQuestions++;
 
         if (userPressedTrue == answerIsTrue) {
             messageResId = R.string.correct_toast;
@@ -135,5 +169,34 @@ public class QuizActivity extends AppCompatActivity {
         }
 
         Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show();
+        calculateScore();
+    }
+
+    //method to enable or disable buttons
+    private void buttonsEnabled(boolean enabled) {
+        mTrueButton.setEnabled(enabled);
+        mFalseButton.setEnabled(enabled);
+    }
+
+    //score calculation
+    private void calculateScore() {
+        int totalQuestions = mQuestionBank.length;
+        int score = correctAnswers * 100 / totalQuestions;
+
+        //show score after all questions are answered
+        if (answeredQuestions == totalQuestions) {
+            String message = "You scored " + score + "% correct answers. The Score wil now reset!";
+            Toast toastScore = Toast.makeText(this, message, Toast.LENGTH_LONG);
+            toastScore.setGravity(Gravity.TOP, 0,0);
+            toastScore.show();
+
+            //reset part
+            correctAnswers = 0;
+            answeredQuestions = 0;
+            for (Question question : mQuestionBank) {
+                question.setQuestionAnswered(false);
+            }
+        }
+
     }
 }
