@@ -1,7 +1,5 @@
 package com.athome.android.geoquiz;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -11,7 +9,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.w3c.dom.Text;
+import androidx.appcompat.app.AppCompatActivity;
 
 public class QuizActivity extends AppCompatActivity {
 
@@ -57,7 +55,6 @@ public class QuizActivity extends AppCompatActivity {
                 mQuestionBank[i].setQuestionAnswered(whichAnswered[i]);
             }
         }
-
         //QUESTION TEXT VIEW
         mQuestionTextView = (TextView) findViewById(R.id.question_text_view);
         mQuestionTextView.setOnClickListener(new View.OnClickListener() {
@@ -67,7 +64,6 @@ public class QuizActivity extends AppCompatActivity {
                 updateQuestion();
             }
         });
-
         //TRUE BUTTON TOAST
         mTrueButton = (Button) findViewById(R.id.true_button);
         mTrueButton.setOnClickListener(new View.OnClickListener() {
@@ -77,7 +73,6 @@ public class QuizActivity extends AppCompatActivity {
 
             }
         });
-
         //FALSE BUTTON TOAST
         mFalseButton = (Button) findViewById(R.id.false_button);
         mFalseButton.setOnClickListener(new View.OnClickListener() {
@@ -86,7 +81,6 @@ public class QuizActivity extends AppCompatActivity {
                 checkAnswer(false);
             }
         });
-
         //NEXT BUTTON FUNCTIONALITY
         mNextButton = findViewById(R.id.next_button);
         mNextButton.setOnClickListener(new View.OnClickListener() {
@@ -122,7 +116,6 @@ public class QuizActivity extends AppCompatActivity {
         super.onSaveInstanceState(savedInstanceState);
         Log.i(TAG, "onSaveInstanceState");
         savedInstanceState.putInt(KEY_INDEX, mCurrentIndex);
-
         //saving state for other keys and variables
         savedInstanceState.putInt(KEY_ANSWERED_QUESTIONS, answeredQuestions);
         savedInstanceState.putInt(KEY_CORRECT_ANSWERS, correctAnswers);
@@ -147,7 +140,6 @@ public class QuizActivity extends AppCompatActivity {
     private void updateQuestion() {
         int question = mQuestionBank[mCurrentIndex].getTextResId();
         mQuestionTextView.setText(question);
-
         if (!mQuestionBank[mCurrentIndex].isQuestionAnswered()) {
             buttonsEnabled(true);
         } else {
@@ -161,14 +153,12 @@ public class QuizActivity extends AppCompatActivity {
         buttonsEnabled(false);
         answeredQuestions++;
         int messageResId = 0;
-
         if (userPressedTrue == answerIsTrue) {
             messageResId = R.string.correct_toast;
             correctAnswers++;
         } else {
             messageResId = R.string.incorrect_toast;
         }
-
         Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show();
         calculateScore();
     }
@@ -183,14 +173,12 @@ public class QuizActivity extends AppCompatActivity {
     private void calculateScore() {
         int totalQuestions = mQuestionBank.length;
         int score = correctAnswers * 100 / totalQuestions;
-
         //show score after all questions are answered
         if (answeredQuestions == totalQuestions) {
             String message = "You scored " + score + "% correct answers. The Score wil now reset!";
             Toast toastScore = Toast.makeText(this, message, Toast.LENGTH_LONG);
             toastScore.setGravity(Gravity.TOP, 0,0);
             toastScore.show();
-
             //reset part
             correctAnswers = 0;
             answeredQuestions = 0;
